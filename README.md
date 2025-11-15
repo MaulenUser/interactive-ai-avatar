@@ -1,18 +1,18 @@
 # interactive-ai-avatar
 Live-kit, Rag, Admin panel
 
-## Установка
+Клонируйте репозиторий:
 git clone https://github.com/MaulenUser/interactive-ai-avatar.git
 
-Перейдите в проект:
-cd dev-app
+Перейдите в директорию проекта:
+cd interactive-ai-avatar/dev-app
 
 Установите зависимости:
 uv sync
 
-Запуск бота:
+Запустите бота:
 cd src
-uv ran agent.py console
+uv run agent.py console
 
 
 
