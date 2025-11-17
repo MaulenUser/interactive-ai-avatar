@@ -67,17 +67,20 @@ def setup_stt_logging(stt_model: str):
 # STT FACTORY
 # -----------------------------------------------------
 def stt_factory(model_name: str):
+    api_key = os.getenv("OPENAI_API_KEY", "")
+        
     if model_name.startswith("assemblyai"):
         return inference.STT(model=model_name)
 
-    if model_name.startswith("openai/whisper"):
-        return inference.STT(model=model_name)
+    if (model_name.startswith("openai/") or 
+        model_name.startswith("whisper-") or 
+        model_name.startswith("gpt-4o-transcribe") or
+        model_name == "whisper-1"):
+        clean_model = model_name.replace("openai/", "")
+        return openai.STT(model=clean_model, api_key=api_key)
 
     if model_name.startswith("silero"):
         return silero.STT(model=model_name)
-    
-    # if model_name.startswith("groq"):
-    #     return groq.STT(model=model_name)
 
     raise ValueError(f"Unknown STT model: {model_name}")
 
@@ -111,11 +114,10 @@ async def entrypoint(ctx: JobContext):
 
     ctx.log_context_fields = {"room": ctx.room.name}
 
-    target_stt = os.getenv("TARGET_STT", "openai/whisper-tiny.en")
+    target_stt = os.getenv("TARGET_STT", "gpt-4o-transcribe")
 
     session = AgentSession(
-        # stt=stt_factory(target_stt),
-        stt = openai.WhisperSTT(model="openai/whisper-tiny.en"),
+        stt=stt_factory(target_stt),
         llm=inference.LLM(model="openai/gpt-4.1-mini"),
         tts=inference.TTS(
             model="cartesia/sonic-3",
